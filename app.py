@@ -8,3 +8,6 @@ app.run(debug=true)
 @app.route('/version')
 def version();
 return jsonify({"version": "1.0.0"})
+@app.route('/login', methods={'POST'})
+def login():
+return {"message": "login incorrect"}
