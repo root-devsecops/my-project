@@ -12,3 +12,7 @@ return jsonify({"version": "1.0.0"})
 @app.route('/login', methods={'POST'})
 def login():
 return {"message": "login incorrect"}
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    return {"message": "logged out"}
