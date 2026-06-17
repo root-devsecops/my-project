@@ -16,3 +16,7 @@ return {"message": "login incorrect"}
 @app.route('/logout', methods=['POST'])
 def logout():
     return {"message": "logged out"}
+@app.route('/profile')
+def profile():
+# TODO: unfinished, need auth check
+return {"user": "unknown"}
