@@ -1,2 +1,3 @@
 debug =flase
 max_reties = 3
+AWS_ACCESS_KEY_ID=AKIS3847394EXAMPLEKEY
