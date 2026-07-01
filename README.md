@@ -11,3 +11,4 @@ gpg sign
 # push test
 test
 test
+test
