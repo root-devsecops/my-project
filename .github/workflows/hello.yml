@@ -1,0 +1,24 @@
+name: Hello DevSecOps
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Say hello
+        run: echo "Hello from GitHub Actions!"
+
+      - name: Show runner info
+        run: |
+          echo "OS: $(uname -a)"
+          echo "User: $(whoami)"
+          echo "Working dir: $(pwd)"
+          echo "Date: $(date)"
