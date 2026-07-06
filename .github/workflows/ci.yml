@@ -1,15 +1,10 @@
-name: CI Pipeline
-
 on:
   push:
     branches:
       - master
-  pull_request:
     branches:
       - master
-
 permissions:
-  contents: read
 
 jobs:
   test:
@@ -17,49 +12,34 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: List repository files
         run: ls -la
 
       - name: Set up Python
-          echo "Flask started with PID $APP_PID"
-          # Wait up to 15 seconds for Flask to start
-          for i in {1..15}; do
-            if curl -s http://localhost:5000/health > /dev/null; then
-              echo "Flask is up ✅"
-            fi
-            echo "Waiting for Flask... attempt $i"
-            sleep 1
-          done
-          
-          # Test the health endpoint
-          RESPONSE=$(curl -s http://localhost:5000/health)
-          echo "Response: $RESPONSE"
-          
-          # Verify response contains expected field
-          if echo "$RESPONSE" | grep -q "status"; then
-            echo "Health check passed ✅"
-          else
-            echo "Health check failed ❌"
-            kill $APP_PID
-            exit 1
-          fi
-          
-          kill $APP_PID              break
-          
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Install dependencies
         run: |
-          APP_PID=$!
-          python app.py &
           python -m pip install --upgrade pip
+
+      - name: Verify app.py exists
+          if [ ! -f app.py ]; then
+            echo "ERROR: app.py not found"
+            exit 1
           fi
-        run: |
-          echo "app.py found ✅"
 
       - name: Run Flask health check
-
+          python app.py &
+          APP_PID=$!
+          echo "Flask started with PID $APP_PID"
+              break
+            fi
+            sleep 1
+          done
+          RESPONSE=$(curl -s http://localhost:5000/health)
+          echo "Response: $RESPONSE"
+          if echo "$RESPONSE" | grep -q "status"; then
+          else
+            kill $APP_PID
