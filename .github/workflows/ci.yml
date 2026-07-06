@@ -1,0 +1,13 @@
+- name: Verify secret is configured
+        env:
+          APP_SECRET: ${{ secrets.MY_APP_SECRET }}
+        run: |
+          # Never print the secret value — check it exists and has content
+          if [ -z "$APP_SECRET" ]; then
+            echo "ERROR: MY_APP_SECRET is not configured ❌"
+            exit 1
+          fi
+          echo "Secret is configured ✅"
+          echo "Secret length: ${#APP_SECRET} characters"
+          # GitHub automatically redacts secrets from logs
+          # but we never print them anyway — good habit
