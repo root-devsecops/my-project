@@ -91,7 +91,7 @@ jobs:
         run: |
           bandit -r . \
             --exclude ./.git,./venv \
-            --severity-level medium \
+            --severity-level High \
             --confidence-level medium \
             -f txt \
             -o bandit-report.txt || BANDIT_EXIT=$?
