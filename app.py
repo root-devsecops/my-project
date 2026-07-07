@@ -27,4 +27,4 @@ def crash():
     raise Exception("Intentional crash for demo")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
