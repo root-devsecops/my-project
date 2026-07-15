@@ -27,4 +27,4 @@ def crash():
     raise Exception("Intentional crash for demo")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=False)
+    app.run(host='0.0.0.0', debug=False)  # nosec B104 - binds all interfaces intentionally for Docker container networking
