@@ -1,0 +1,62 @@
+rules:
+  # Rule 1: Detect print() of sensitive variables
+  - id: print-sensitive-data
+    patterns:
+      - pattern: print($VAR)
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: .*(password|secret|token|key|credential).*
+    message: |
+      Printing sensitive variable '$VAR' may expose secrets in logs.
+      Use logging with appropriate level instead.
+    languages: [python]
+    severity: WARNING
+
+  # Rule 2: Detect hardcoded localhost URLs in production code
+  - id: hardcoded-localhost
+    pattern: $VAR = "http://localhost$..."
+    message: |
+      Hardcoded localhost URL found. Use environment variables
+      for service URLs so they can differ between environments.
+    languages: [python]
+    severity: WARNING
+
+  # Rule 3: Detect missing authentication on Flask routes
+  - id: flask-route-no-auth
+    patterns:
+      - pattern: |
+          @app.route(...)
+          def $FUNC(...):
+              ...
+      - pattern-not: |
+          @app.route(...)
+          @login_required
+          def $FUNC(...):
+              ...
+    message: |
+      Flask route '$FUNC' has no authentication decorator.
+      Ensure this route is intentionally public.
+    languages: [python]
+    severity: INFO
+
+  # Rule 4: Detect response that includes exception details
+  - id: exception-info-disclosure
+    pattern: 'return jsonify({"error": str($EXCEPTION)})'
+    message: |
+      Returning exception details in API response may expose
+      internal implementation details to attackers.
+      Log the exception server-side and return a generic message.
+    languages: [python]
+    severity: WARNING
+
+  # Rule 5: Detect SQL queries without parameterisation
+  - id: sql-string-formatting
+    pattern-either:
+      - pattern: $DB.execute(f"...{$VAR}...")
+      - pattern: $DB.execute("..." + $VAR + "...")
+      - pattern: $DB.execute("..." % $VAR)
+    message: |
+      SQL query uses string formatting with variable '$VAR'.
+      Use parameterised queries: db.execute("SELECT...", (var,))
+    languages: [python]
+    severity: ERROR
