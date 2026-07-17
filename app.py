@@ -19,6 +19,11 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return jsonify({"message": "Flask DevSecOps App", "version": "1.0"})
+@app.route('/')
+def index():
+    return jsonify({"message": "Flask DevSecOps App", "version": "1.0"})
+
+
 @app.after_request
 def add_security_headers(response):
     # Prevent MIME type sniffing
