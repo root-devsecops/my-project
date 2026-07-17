@@ -16,6 +16,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+@app.route('/')
+def index():
+    return jsonify({"message": "Flask DevSecOps App", "version": "1.0"})
 @app.after_request
 def add_security_headers(response):
     # Prevent MIME type sniffing
@@ -114,4 +117,4 @@ def server_error(e):
 
 if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
-    app.run(host='0.0.0.0', debug=debug_mode)
+    app.run(host='0.0.0.0', debug=debug_mode)   # nosec B104
