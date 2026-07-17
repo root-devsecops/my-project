@@ -176,7 +176,8 @@ jobs:
         with:
           name: semgrep-report
           path: semgrep-report.json
-          dast-scan:
+
+  dast-scan:
     runs-on: ubuntu-latest
     needs: test
 
@@ -196,8 +197,6 @@ jobs:
       - name: Start Flask app
         run: |
           python app.py &
-          APP_PID=$!
-          echo "APP_PID=$APP_PID" >> $GITHUB_ENV
           for i in {1..15}; do
             if curl -s http://localhost:5000/health > /dev/null; then
               echo "Flask is up"
@@ -211,7 +210,6 @@ jobs:
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: http://localhost:5000
-          rules_file_name: .zap/rules.tsv
           cmd_options: '-I'
 
       - name: Upload ZAP Report
@@ -220,5 +218,3 @@ jobs:
         with:
           name: zap-security-report
           path: report_html.html
-
-          
