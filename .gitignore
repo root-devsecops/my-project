@@ -26,4 +26,6 @@ apikey.txt
 
 # Docker artifacts
 flask-app:multistage
-tmpfs
+tmpfsgrype-report.json
+sbom.json
+sbom-spdx.json
