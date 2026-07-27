@@ -280,4 +280,45 @@ jobs:
           sbom: sbom.json
           fail-build: false
           severity-cutoff: critical
+          
+iac-scan:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Terraform
+        run: |
+          checkov -d terraform \
+            --framework terraform \
+            --output cli \
+            --output json \
+            --output-file-path checkov-report.json \
+            --soft-fail || CHECKOV_EXIT=$?
+          echo "Checkov exit code: ${CHECKOV_EXIT:-0}"
+          exit ${CHECKOV_EXIT:-0}
+
+      - name: Run Checkov on GitHub Actions workflows
+        run: |
+          checkov -d .github/workflows \
+            --framework github_actions \
+            --soft-fail \
+            --compact
+
+      - name: Upload Checkov report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checkov-iac-report
+          path: checkov-report.json
         
