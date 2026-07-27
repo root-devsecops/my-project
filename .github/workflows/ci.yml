@@ -280,8 +280,8 @@ jobs:
           sbom: sbom.json
           fail-build: false
           severity-cutoff: critical
-          
-iac-scan:
+
+  iac-scan:
     runs-on: ubuntu-latest
     needs: test
 
