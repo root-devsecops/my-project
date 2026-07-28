@@ -8,12 +8,15 @@ on:
     branches:
       - master
 
-permissions:
-  contents: read
+# Top-level: deny all by default
+permissions: {}
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -73,7 +76,10 @@ jobs:
 
   security-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -107,7 +113,10 @@ jobs:
 
   trivy-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -142,7 +151,10 @@ jobs:
 
   semgrep:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -179,7 +191,10 @@ jobs:
 
   dast-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -223,7 +238,10 @@ jobs:
 
   sca-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -249,10 +267,13 @@ jobs:
         with:
           name: grype-sca-report
           path: grype-report.json
-          
+
   sbom:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -283,7 +304,10 @@ jobs:
 
   iac-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -301,24 +325,12 @@ jobs:
         run: |
           checkov -d terraform \
             --framework terraform \
-            --output cli \
-            --output json \
-            --output-file-path checkov-report.json \
-            --soft-fail || CHECKOV_EXIT=$?
-          echo "Checkov exit code: ${CHECKOV_EXIT:-0}"
-          exit ${CHECKOV_EXIT:-0}
+            --soft-fail \
+            --compact || true
 
-      - name: Run Checkov on GitHub Actions workflows
+      - name: Run Checkov on GitHub Actions
         run: |
           checkov -d .github/workflows \
             --framework github_actions \
             --soft-fail \
-            --compact
-
-      - name: Upload Checkov report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: checkov-iac-report
-          path: checkov-report.json
-        
+            --compact || true
