@@ -106,3 +106,5 @@ def not_found(e):
 
 @app.errorhandler(500)
 def server_error(e):
+    logger.error(f"Internal error: {e}", exc_info=True)
+    return jsonify({"error": "Internal server error"}), 500
