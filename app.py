@@ -108,3 +108,6 @@ def not_found(e):
 def server_error(e):
     logger.error(f"Internal error: {e}", exc_info=True)
     return jsonify({"error": "Internal server error"}), 500
+    if __name__ == '__main__':
+    debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(host='0.0.0.0', debug=debug_mode)  # nosec B104
