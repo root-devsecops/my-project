@@ -334,3 +334,32 @@ jobs:
             --framework github_actions \
             --soft-fail \
             --compact || true
+
+  k8s-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: test
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+            | sudo sh -s -- -b /usr/local/bin
+
+      - name: Scan K8s manifests with Trivy
+        run: |
+          trivy config k8s/ \
+            --severity HIGH,CRITICAL \
+            --exit-code 0 \
+            --format table
+
+      - name: Scan K8s manifests with Kubesec
+        run: |
+          curl -sSX POST \
+            --data-binary @k8s/base/pod-secure.yaml \
+            https://v2.kubesec.io/scan | python3 -m json.tool

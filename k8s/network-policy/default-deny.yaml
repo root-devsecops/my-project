@@ -1,0 +1,11 @@
+# Deny all ingress and egress by default
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: flask-app
+spec:
+  podSelector: {}  # applies to ALL pods in namespace
+  policyTypes:
+    - Ingress
+    - Egress

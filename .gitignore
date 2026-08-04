@@ -29,3 +29,4 @@ flask-app:multistage
 tmpfsgrype-report.json
 sbom.json
 sbom-spdx.json
+k8/base/secret.yaml

@@ -1,0 +1,23 @@
+# INTENTIONALLY INSECURE — for scanning demo only
+apiVersion: v1
+kind: Pod
+metadata:
+  name: flask-insecure
+  namespace: default
+spec:
+  containers:
+    - name: flask
+      image: flask-app:v1
+      ports:
+        - containerPort: 5000
+      # INSECURE: Running as root
+      # INSECURE: No resource limits
+      # INSECURE: Privileged mode
+      securityContext:
+        privileged: true
+        runAsRoot: true
+        allowPrivilegeEscalation: true
+      env:
+        # INSECURE: Hardcoded secret
+        - name: DB_PASSWORD
+          value: "SuperSecret123"
