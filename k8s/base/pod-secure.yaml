@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: flask-secure
+  namespace: flask-app
+  labels:
+    app: flask
+    version: "1.0"
+spec:
+  # SECURE: Non-root service account
+  serviceAccountName: flask-sa
+
+  # SECURE: Pod-level security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+
+  containers:
+    - name: flask
+      image: flask-app:latest
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 5000
+          protocol: TCP
+
+      # SECURE: Container-level security context
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        capabilities:
+          drop:
+            - ALL
+
+      # SECURE: Resource limits
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+        limits:
+          memory: "128Mi"
+          cpu: "200m"
+
+      # SECURE: Secret from Kubernetes Secret object
+      env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flask-secrets
+              key: db_password
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: flask-secrets
+              key: secret_key
+
+      # SECURE: Liveness and readiness probes
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 5000
+        initialDelaySeconds: 10
+        periodSeconds: 30
+
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 5000
+        initialDelaySeconds: 5
+        periodSeconds: 10
+
+      # SECURE: Writable temp directory only
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+
+  volumes:
+    - name: tmp
+      emptyDir: {}
